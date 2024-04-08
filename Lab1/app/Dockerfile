@@ -2,16 +2,15 @@ FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    cmake \
-    g++
+    g++ \
+    libsqlite3-dev
 
 WORKDIR /app
 
 COPY . .
 
-RUN cmake . && \
-    make
+RUN g++ -o server server.cpp -lpthread -lsqlite3
 
 EXPOSE 8080
 
-CMD ["./Server"]
+CMD ["./server"]
