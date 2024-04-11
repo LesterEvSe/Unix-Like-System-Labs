@@ -1,0 +1,12 @@
+DockerCompose.yml
+
+-----
+version: '3'
+
+services:
+  client1:
+    ...
+  client2:
+    ...
+  server:
+    ...
