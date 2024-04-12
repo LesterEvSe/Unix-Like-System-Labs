@@ -7,7 +7,7 @@
 #include <mutex>
 
 const std::string GET = "GET_MESSAGES";
-Database db("messages.sqlite");
+Database db("/data/messages.sqlite");
 
 void handleClient(int client_socket) {
     char buffer[1024];
