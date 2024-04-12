@@ -6,12 +6,12 @@
 #include <arpa/inet.h>
 #include <thread>
 #include <chrono>
-#include <sstream> // for output
 
 
 void send_message(const std::string &username, int client_socket) {
     static const std::string REQUEST = "GET_MESSAGES";
     char buffer[1024];
+    std::cout << "Enter the 'GET' command to load messages from the database, 'EXIT' to exit" << std::endl << std::endl;
 
     while (true)
     {
@@ -53,7 +53,7 @@ int main() {
     }
 
     // Server set up
-    const char *serverIP = "server"; //"127.0.0.1";
+    const char *serverIP = "http://172.17.0.2"; //"server"; //"127.0.0.1";
     const int serverPort = 2222;
 
     sockaddr_in serverAddress;

@@ -40,14 +40,35 @@ Database::~Database() {
 }
 
 void Database::emplace_back(const std::string &message) {
-    std::string sql = "INSERT INTO messages (message) VALUES ('" + message + "');";
-    int rc = sqlite3_exec(database, sql.c_str(), nullptr, 0, nullptr);
+    // Подготовка запроса
+    sqlite3_stmt *stmt;
+    const char *tail;
 
+    std::string sql = "INSERT INTO messages (message) VALUES (?);";
+    int rc = sqlite3_prepare_v2(database, sql.c_str(), -1, &stmt, &tail);
     if (rc != SQLITE_OK) {
-        std::cerr << "SQL error: " << sqlite3_errmsg(database) << std::endl;
+        std::cerr << "SQL error during preparation: " << sqlite3_errmsg(database) << std::endl;
         sqlite3_close(database);
         exit(1);
     }
+
+    // Привязка параметра
+    rc = sqlite3_bind_text(stmt, 1, message.c_str(), -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error during parameter binding: " << sqlite3_errmsg(database) << std::endl;
+        sqlite3_finalize(stmt);
+        sqlite3_close(database);
+        exit(1);
+    }
+
+    // Выполнение запроса
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        std::cerr << "SQL error during execution: " << sqlite3_errmsg(database) << std::endl;
+    }
+
+    // Очистка ресурсов
+    sqlite3_finalize(stmt);
 }
 
 std::vector<std::string> Database::last_messages(int number) {

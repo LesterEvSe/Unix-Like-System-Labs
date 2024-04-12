@@ -16,13 +16,16 @@ void handleClient(int client_socket) {
         int bytesReceived = recv(client_socket, buffer, sizeof(buffer), 0);
 
         if (bytesReceived <= 0) {
-            std::cerr << "Connection closed\n";
+            std::cerr << "Connection closed" << std::endl;
             break;
         }
 
         std::string message = buffer;
+        if (message.size() >= 5 && message.substr(0, 5) == "GET /")
+            continue;
         if (message != GET) {
             db.emplace_back(message);
+            std::cout << message << std::endl;
             continue;
         }
 
@@ -39,7 +42,7 @@ int main() {
     // Create server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
-        std::cerr << "Error creating server socket\n";
+        std::cerr << "Error creating server socket" << std::endl;
         return 1;
     }
 
@@ -53,21 +56,16 @@ int main() {
 
     // Binding a socket to an address and port
     if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1) {
-        std::cerr << "Error binding server socket\n";
+        std::cerr << "Error binding server socket" << std::endl;
         return 1;
     }
 
     // Start listening messages
     if (listen(serverSocket, SOMAXCONN) == -1) {
-        std::cerr << "Error listening on server socket\n";
+        std::cerr << "Error listening on server socket" << std::endl;
         return 1;
     }
     std::cout << "Server is running on port " << port << std::endl;
-
-    /*
-    for (std::string str : db.last_messages())
-        std::cout << str << std::endl;
-    */
 
     // Get connections and processing each client in a separate thread
     while (true) {
@@ -75,10 +73,10 @@ int main() {
         socklen_t clientAddressSize = sizeof(clientAddress);
         int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
         if (clientSocket == -1) {
-            std::cerr << "Error accepting connection\n";
+            std::cerr << "Error accepting connection" << std::endl;
             continue;
         }
-        std::cout << "New connection established\n";
+        std::cout << "New connection established" << std::endl;
 
         // Start processing the client
         std::thread clientThread(handleClient, clientSocket);
